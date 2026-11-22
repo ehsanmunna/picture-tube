@@ -39,7 +39,7 @@ export default function ServerScreen() {
   };
   
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={[]}>
       <ScrollView keyboardShouldPersistTaps="handled">
         <Text style={styles.heading}>Add Server</Text>
         <TextInput style={styles.input} placeholder="Server name" value={name} onChangeText={setName} />

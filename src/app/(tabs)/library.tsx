@@ -28,7 +28,7 @@ export default function LibraryScreen() {
     [query, year, language]
   );
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={[]}>
 
     {/* <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
       <Text>Library Page</Text>
