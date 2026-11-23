@@ -6,6 +6,7 @@ export interface MediaItem {
   year: number;
   language: string;
   size: string;
+  url: string; // direct video link
 }
 
 export interface MediaServer {
@@ -20,5 +21,6 @@ export interface DirNode {
   path: string;
   checked: boolean;
   expanded: boolean;
-  children?: DirNode[];
+  loading?: boolean;
+  children?: DirNode[]; // undefined = not loaded yet, [] = loaded but empty
 }

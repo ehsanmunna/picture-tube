@@ -10,9 +10,7 @@
     "experiments": {
       "typedRoutes": true
     },
-    "ios": {
-      "supportsTablet": true
-    },
+     "ios": { "supportsTablet": true, "infoPlist": { "NSAppTransportSecurity": { "NSAllowsArbitraryLoads": true } } },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
@@ -26,7 +24,9 @@
     },
     "plugins": [
       "expo-router",
-      "expo-status-bar"
+      "expo-status-bar",
+      "expo-video",
+      ["expo-build-properties", { "android": { "usesCleartextTraffic": true } }]
     ]
   }
 }
