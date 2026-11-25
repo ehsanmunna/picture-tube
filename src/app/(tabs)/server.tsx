@@ -8,8 +8,10 @@ import { theme } from '../../theme';
 import { ApiFile, DirNode } from '../../types';
 import { collectChecked, toggleChecked, updateNode } from '../../utils/tree';
 import { mergeFolders } from '../../utils/tree-update';
+import { useRouter } from 'expo-router';
 
 export default function ServerScreen({ navigation }: any) {
+  const router = useRouter();
   const [name, setName] = useState('');
   const [tree, setTree] = useState<DirNode[]>([]);
 
@@ -85,7 +87,6 @@ export default function ServerScreen({ navigation }: any) {
   };
 
   const onToggleExpand = (node: DirNode) => {
-    console.log('[Server] expand', node.path);
     setTree((t) => updateNode(t, node.id, (n) => ({ ...n, expanded: !n.expanded })));
   };
 
@@ -96,6 +97,15 @@ export default function ServerScreen({ navigation }: any) {
 
   const onPressFile = (file: ApiFile) => {
   console.log('[Server] file', file.name, file.url);
+  router.push({
+      pathname: '/player',
+      params: { 
+        id: file.id,
+        title: file.name,
+        url: file.url,
+        ext: file.ext,
+      },
+    });
 };
 
   return (
