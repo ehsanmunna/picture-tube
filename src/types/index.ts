@@ -18,16 +18,12 @@ export interface MediaServer {
   url: string;
 }
 
-// export interface DirNode {
-//   id: string;
-//   name: string;
-//   path: string;
-//   checked: boolean;
-//   expanded: boolean;
-//   loading?: boolean;
-//   folders?: BrowseItem[]; // undefined = not loaded yet, [] = loaded but empty
-// }
-
+export interface ApiFile {
+  id: string;
+  name: string;
+  url: string;
+  ext: string;
+}
 
 export interface DirNode {
   id: string;
@@ -35,6 +31,7 @@ export interface DirNode {
   url: string;            // folder url
   parent?: string | null;
   folders?: DirNode[];
+  files?: ApiFile[];     // files directly inside this folder
   checked?: boolean;
   expanded?: boolean;
   loaded?: boolean;        // true once its listing has been fetched

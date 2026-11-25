@@ -1,16 +1,47 @@
-import React from 'react';
-import { ActivityIndicator, Pressable, Text, View, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { DirNode } from '../types';
-import { getCheckState } from '../utils/tree';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import { theme } from '../theme';
-import { BrowseItem } from '../api/client';
+import { ApiFile, DirNode } from '../types';
+import { getCheckState } from '../utils/tree';
 
 interface Props {
   nodes: DirNode[];
   onToggleCheck: (node: DirNode) => void;
   onPressFolder: (node: DirNode) => void;
+  onPressFile?: (file: ApiFile) => void;
   depth?: number;
+}
+
+const VIDEO_EXT = ['mp4', 'mkv', 'avi', 'mov', 'webm', 'ts', 'm4v'];
+
+function FileRow({
+  file,
+  depth,
+  onPress,
+}: {
+  file: ApiFile;
+  depth: number;
+  onPress?: (file: ApiFile) => void;
+}) {
+  const isVideo = VIDEO_EXT.includes(file.ext?.toLowerCase());
+  return (
+    <Pressable
+      onPress={() => onPress?.(file)}
+      style={({ pressed }) => [
+        styles.fileRow,
+        // line up with the folder icons at this level (checkbox column is 44 wide)
+        { paddingLeft: depth * 24 + 44 },
+        pressed && styles.pressed,
+      ]}
+    >
+      <Ionicons
+        name={isVideo ? 'videocam' : 'document-outline'}
+        size={20}
+        color={theme.colors.textMuted}
+      />
+      <Text style={styles.name} numberOfLines={1}>{file.name}</Text>
+    </Pressable>
+  );
 }
 
 function Checkbox({ state, onPress }: { state: ReturnType<typeof getCheckState>; onPress: () => void }) {
@@ -25,7 +56,9 @@ function Checkbox({ state, onPress }: { state: ReturnType<typeof getCheckState>;
   );
 }
 
-export function TreeView({ nodes, onToggleCheck, onPressFolder, depth = 0 }: Props) {
+
+
+export function TreeView({ nodes, onToggleCheck, onPressFolder, onPressFile, depth = 0 }: Props) {
   return (
     <View>
       {nodes.map((node) => (
@@ -55,13 +88,28 @@ export function TreeView({ nodes, onToggleCheck, onPressFolder, depth = 0 }: Pro
             </Pressable>
           </View>
 
-          {node.expanded && node.folders && node.folders.length > 0 && (
-            <TreeView
-              nodes={node.folders}
-              onToggleCheck={onToggleCheck}
-              onPressFolder={onPressFolder}
-              depth={depth + 1}
-            />
+          {node.expanded && (
+            <>
+              {node.folders && node.folders.length > 0 && (
+                <TreeView
+                  nodes={node.folders}
+                  onToggleCheck={onToggleCheck}
+                  onPressFolder={onPressFolder}
+                  onPressFile={onPressFile}
+                  depth={depth + 1}
+                />
+              )}
+
+              {node.files?.map((file) => (
+                <FileRow key={file.id} file={file} depth={depth + 1} onPress={onPressFile} />
+              ))}
+
+              {node.loaded &&
+                !node.folders?.length &&
+                !node.files?.length && (
+                  <Text style={[styles.empty, { paddingLeft: (depth + 1) * 24 + 44 }]}>Empty</Text>
+                )}
+            </>
           )}
         </View>
       ))}
@@ -93,4 +141,13 @@ const styles = StyleSheet.create({
   },
   pressed: { backgroundColor: theme.colors.surface },
   name: { flex: 1, fontSize: 16, color: theme.colors.text },
+  fileRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+    minHeight: 44,
+    paddingRight: theme.spacing.sm,
+    borderRadius: theme.radius.sm,
+  },
+  empty: { color: theme.colors.textMuted, fontSize: 14, paddingVertical: 8 },
 });

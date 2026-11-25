@@ -1,14 +1,12 @@
-import { View, Text, StyleSheet, ScrollView, TextInput, ActivityIndicator, Button } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
-import { theme } from '../../theme';
+import { useState } from 'react';
+import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { addServer } from '../../api/client';
 import { AppButton } from '../../components/AppButton';
 import { TreeView } from '../../components/TreeView';
-import { useState } from 'react';
-import { DirNode } from '../../types';
-import { MOCK_TREE, fetchChildren } from '../../data/mock';
-import { collectChecked, updateNode, toggleChecked } from '../../utils/tree';
-import { addServer } from '../../api/client';
+import { theme } from '../../theme';
+import { ApiFile, DirNode } from '../../types';
+import { collectChecked, toggleChecked, updateNode } from '../../utils/tree';
 import { mergeFolders } from '../../utils/tree-update';
 
 export default function ServerScreen({ navigation }: any) {
@@ -28,7 +26,15 @@ export default function ServerScreen({ navigation }: any) {
     try {
       const server = await addServer(link); // uses the link value
 
-      setTree([{ id: server.id, name: server.name, url: server.url, folders: server.folders, checked: false, expanded: true }]);
+      setTree([{
+        id: server.id,
+        name: server.name,
+        url: server.url,
+        folders: server.folders,
+        files: server.files,
+        checked: false,
+        expanded: true
+      }]);
     } catch (e: any) {
       setError(e.message);
     } finally {
@@ -65,6 +71,7 @@ export default function ServerScreen({ navigation }: any) {
           ...n,
           parent: listing.parent,
           folders: mergeFolders(n.folders, listing.folders, !!n.checked),
+          files: listing.files ?? [],
           expanded: true,
           loaded: true,
           loading: false,
@@ -87,6 +94,10 @@ export default function ServerScreen({ navigation }: any) {
     console.log('[Server] Scan pressed, selected directories:', paths);
   };
 
+  const onPressFile = (file: ApiFile) => {
+  console.log('[Server] file', file.name, file.url);
+};
+
   return (
     <SafeAreaView style={styles.container} edges={[]}>
       <ScrollView keyboardShouldPersistTaps="handled">
@@ -106,7 +117,7 @@ export default function ServerScreen({ navigation }: any) {
         {tree.length > 0 && (
           <View style={{ marginTop: theme.spacing.lg }}>
             <Text style={styles.heading}>Directories</Text>
-            <TreeView nodes={tree} onToggleCheck={onToggleCheck} onPressFolder={onPressFolder} />
+            <TreeView nodes={tree} onToggleCheck={onToggleCheck} onPressFolder={onPressFolder} onPressFile={onPressFile} />
             <View style={{ marginTop: theme.spacing.md }}>
               <AppButton title="Scan" onPress={onScan} />
             </View>
