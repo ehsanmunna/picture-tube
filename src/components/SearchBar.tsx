@@ -6,8 +6,8 @@ import { theme } from '../theme';
 
 interface Props {
   query: string;
-  year: string;
-  language: string;
+  year: string | undefined;
+  language: string | undefined;
   onQueryChange: (v: string) => void;
   onYearChange: (v: string) => void;
   onLanguageChange: (v: string) => void;

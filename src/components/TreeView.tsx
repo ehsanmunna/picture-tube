@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { DirNode } from '../types';
 import { getCheckState } from '../utils/tree';
 import { theme } from '../theme';
+import { BrowseItem } from '../api/client';
 
 interface Props {
   nodes: DirNode[];
@@ -54,9 +55,9 @@ export function TreeView({ nodes, onToggleCheck, onPressFolder, depth = 0 }: Pro
             </Pressable>
           </View>
 
-          {node.expanded && node.children && node.children.length > 0 && (
+          {node.expanded && node.folders && node.folders.length > 0 && (
             <TreeView
-              nodes={node.children}
+              nodes={node.folders}
               onToggleCheck={onToggleCheck}
               onPressFolder={onPressFolder}
               depth={depth + 1}

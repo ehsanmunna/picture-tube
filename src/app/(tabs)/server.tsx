@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, TextInput } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, ActivityIndicator, Button } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { theme } from '../../theme';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -8,49 +8,72 @@ import { useState } from 'react';
 import { DirNode } from '../../types';
 import { MOCK_TREE, fetchChildren } from '../../data/mock';
 import { collectChecked, updateNode, toggleChecked } from '../../utils/tree';
+import { addServer } from '../../api/client';
+import { mergeFolders } from '../../utils/tree-update';
 
-export default function ServerScreen() {
+export default function ServerScreen({ navigation }: any) {
   const [name, setName] = useState('');
-  const [link, setLink] = useState('');
   const [tree, setTree] = useState<DirNode[]>([]);
 
-  const onAdd = () => {
-    console.log('[Server] Add pressed', { name, link });
+
+  const [link, setLink] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const onAdd = async () => {
+    // console.log('[Server] Add pressed', { name, link });
     // TODO Phase 3: fetch the directory listing from `link`
-    setTree(MOCK_TREE);
+    setLoading(true);
+    setError('');
+    try {
+      const server = await addServer(link); // uses the link value
+
+      setTree([{ id: server.id, name: server.name, url: server.url, folders: server.folders, checked: false, expanded: true }]);
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const onToggleCheck = (node: DirNode) => {
     const value = !node.checked; // partial -> checked
-    console.log('[Server] check', node.path, value);
+    console.log('[Server] check', node.url, value);
     setTree((t) => toggleChecked(t, node.id, value));
   };
 
   const onPressFolder = async (node: DirNode) => {
+    // Ignore taps while this folder is already loading
     if (node.loading) return;
-    console.log('[Server] check', node.path);
-    // already loaded: just open/close
-    if (node.children) {
+
+    // Already fetched: just expand/collapse
+    if (node.loaded) {
       setTree((t) => updateNode(t, node.id, (n) => ({ ...n, expanded: !n.expanded })));
       return;
     }
 
-    // not loaded: show spinner, load children, then show them
-    console.log('[Server] load children of', node.path);
-    setTree((t) => updateNode(t, node.id, (n) => ({ ...n, loading: true, expanded: true })));
+    // Show the spinner
+    setTree((t) => updateNode(t, node.id, (n) => ({ ...n, loading: true })));
+
     try {
-      const kids = await fetchChildren(node.path);
+      const listing = await addServer(node.url);
+
+      // Merge children and hide the spinner in the same state update,
+      // so the spinner disappears exactly when the children render
       setTree((t) =>
         updateNode(t, node.id, (n) => ({
           ...n,
+          parent: listing.parent,
+          folders: mergeFolders(n.folders, listing.folders, !!n.checked),
+          expanded: true,
+          loaded: true,
           loading: false,
-          // children loaded under a checked parent start checked
-          children: kids.map((k) => ({ ...k, checked: n.checked })),
         }))
       );
-    } catch (e) {
-      console.log('[Server] load failed', e);
-      setTree((t) => updateNode(t, node.id, (n) => ({ ...n, loading: false, expanded: false })));
+    } catch (e: any) {
+      setError(e.message);
+      // Hide the spinner on failure too, otherwise it spins forever
+      setTree((t) => updateNode(t, node.id, (n) => ({ ...n, loading: false })));
     }
   };
 
@@ -77,6 +100,7 @@ export default function ServerScreen() {
           value={link}
           onChangeText={setLink}
         />
+        {!!error && <Text style={{ color: 'red', marginVertical: 8 }}>{error}</Text>}
         <AppButton title="Add" onPress={onAdd} />
 
         {tree.length > 0 && (
