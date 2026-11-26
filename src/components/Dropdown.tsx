@@ -4,7 +4,7 @@ import { theme } from '../theme';
 
 interface Props {
   label: string;
-  value: string;
+  value?: string;
   options: string[];
   onChange: (value: string) => void;
 }

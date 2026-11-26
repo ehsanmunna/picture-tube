@@ -20,7 +20,6 @@ export default function PlayerScreen() {
           style={styles.video}
           player={player}
           nativeControls
-          allowsFullscreen
           allowsPictureInPicture
         />
       ) : (

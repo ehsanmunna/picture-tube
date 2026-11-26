@@ -1,3 +1,5 @@
+import { BrowseItem } from "../api/client";
+
 export type ViewMode = 'list' | 'table';
 
 export interface MediaItem {
@@ -7,6 +9,7 @@ export interface MediaItem {
   language: string;
   size: string;
   url: string; // direct video link
+  thumb?: string;
 }
 
 export interface MediaServer {
@@ -15,12 +18,28 @@ export interface MediaServer {
   url: string;
 }
 
+export interface ApiFile {
+  id: string;
+  name: string;
+  url: string;
+  ext: string;
+}
+
 export interface DirNode {
   id: string;
   name: string;
-  path: string;
-  checked: boolean;
-  expanded: boolean;
+  url: string;            // folder url
+  parent?: string | null;
+  folders?: DirNode[];
+  files?: ApiFile[];     // files directly inside this folder
+  checked?: boolean;
+  expanded?: boolean;
+  loaded?: boolean;        // true once its listing has been fetched
   loading?: boolean;
-  children?: DirNode[]; // undefined = not loaded yet, [] = loaded but empty
+}
+
+export interface ApiFolder {
+  id: string;
+  name: string;
+  url: string;
 }

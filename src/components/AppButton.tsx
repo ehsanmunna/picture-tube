@@ -1,18 +1,22 @@
-import React from 'react';
-import { Pressable, Text, StyleSheet } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Text } from 'react-native';
 import { theme } from '../theme';
 
-interface Props {
+type Props = {
   title: string;
   onPress: () => void;
-  variant?: 'primary' | 'outline';
-}
+  loading?: boolean;
+  disabled?: boolean;
+};
 
-export function AppButton({ title, onPress, variant = 'primary' }: Props) {
-  const outline = variant === 'outline';
+export function AppButton({ title, onPress, loading = false, disabled = false }: Props) {
+  const inactive = disabled || loading;
   return (
-    <Pressable onPress={onPress} style={[styles.btn, outline && styles.outline]}>
-      <Text style={[styles.text, outline && { color: theme.colors.primary }]}>{title}</Text>
+    <Pressable
+      onPress={onPress}
+      disabled={inactive}
+      style={[styles.btn, inactive && styles.inactive]}
+    >
+      {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.text}>{title}</Text>}
     </Pressable>
   );
 }
@@ -24,7 +28,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: theme.radius.md,
     alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 44,
   },
-  outline: { backgroundColor: 'transparent', borderWidth: 1, borderColor: theme.colors.primary },
+  inactive: { opacity: 0.6 },
   text: { color: '#fff', fontWeight: '600', fontSize: 16 },
 });
