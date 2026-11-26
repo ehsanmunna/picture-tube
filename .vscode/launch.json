@@ -1,0 +1,21 @@
+
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Attach to Expo app (Hermes)",
+      "cwd": "${workspaceFolder}",
+      "type": "reactnativedirect",
+      "request": "attach",
+      "platform": "exponent"
+    },
+    {
+      "name": "Debug Android (Expo Go)",
+      "cwd": "${workspaceFolder}",
+      "type": "reactnative",
+      "request": "launch",
+      "platform": "exponent",
+      "expoPlatformType": "android"
+    }
+  ]
+}

@@ -10,7 +10,14 @@
     "experiments": {
       "typedRoutes": true
     },
-     "ios": { "supportsTablet": true, "infoPlist": { "NSAppTransportSecurity": { "NSAllowsArbitraryLoads": true } } },
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
+      }
+    },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
@@ -26,7 +33,15 @@
       "expo-router",
       "expo-status-bar",
       "expo-video",
-      ["expo-build-properties", { "android": { "usesCleartextTraffic": true } }]
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
+      ],
+      "expo-sqlite"
     ]
   }
 }

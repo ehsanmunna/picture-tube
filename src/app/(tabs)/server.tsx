@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { addServer } from '../../api/client';
 import { AppButton } from '../../components/AppButton';
@@ -9,6 +9,7 @@ import { ApiFile, DirNode } from '../../types';
 import { collectChecked, toggleChecked, updateNode } from '../../utils/tree';
 import { mergeFolders } from '../../utils/tree-update';
 import { useRouter } from 'expo-router';
+import { addSelectedToLibrary, TreeNode } from '../../db/addToLibrary';
 
 export default function ServerScreen({ navigation }: any) {
   const router = useRouter();
@@ -90,10 +91,54 @@ export default function ServerScreen({ navigation }: any) {
     setTree((t) => updateNode(t, node.id, (n) => ({ ...n, expanded: !n.expanded })));
   };
 
-  const onScan = () => {
-    const paths = collectChecked(tree);
-    console.log('[Server] Scan pressed, selected directories:', paths);
-  };
+  const gatherChecked = async (nodes: DirNode[], out: TreeNode[] = []): Promise<TreeNode[]> => {
+  for (const n of nodes) {
+    if (n.checked !== true) {
+      // an unchecked/partial parent can still have checked children
+      if (n.folders?.length) await gatherChecked(n.folders, out);
+      continue;
+    }
+
+    let files = n.files ?? [];
+    let folders = (n.folders ?? []) as DirNode[];
+
+    if (!n.loaded) {
+      const listing = await addServer(n.url);
+      files = listing.files ?? [];
+      // children of a checked folder count as checked
+      folders = (listing.folders ?? []).map((f: any) => ({ ...f, checked: true })) as DirNode[];
+    }
+
+    if (files.length) out.push({ id: n.id, name: n.name, url: n.url, files });
+    if (folders.length) await gatherChecked(folders, out);
+  }
+  return out;
+};
+
+const onScan = async () => {
+  if (!tree.length || loading) return;
+  setLoading(true);
+  setError('');
+  try {
+    const serverId = new URL(tree[0].url).hostname;
+    const checkedNodes = await gatherChecked(tree);
+
+    if (!checkedNodes.length) {
+      setError('Select at least one folder with files');
+      return;
+    }
+
+    const stats = await addSelectedToLibrary(checkedNodes, serverId);
+    Alert.alert(
+      'Library updated',
+      `${stats.added} added, ${stats.skippedNotVideo} non-video skipped, ${stats.skippedNoFiles} empty folders skipped`,
+    );
+  } catch (e: any) {
+    setError(e.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const onPressFile = (file: ApiFile) => {
   console.log('[Server] file', file.name, file.url);
@@ -129,7 +174,8 @@ export default function ServerScreen({ navigation }: any) {
             <Text style={styles.heading}>Directories</Text>
             <TreeView nodes={tree} onToggleCheck={onToggleCheck} onPressFolder={onPressFolder} onPressFile={onPressFile} />
             <View style={{ marginTop: theme.spacing.md }}>
-              <AppButton title="Scan" onPress={onScan} />
+              {/* <AppButton title="Scan" onPress={onScan} /> */}
+              <AppButton title="Scan" onPress={onScan} loading={loading} disabled={loading} />
             </View>
           </View>
         )}
