@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Modal, Pressable, Text, FlatList, StyleSheet, View } from 'react-native';
-import { theme } from '../theme';
+import { theme } from '../../theme';
 
 interface Props {
   label: string;

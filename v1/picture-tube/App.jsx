@@ -2,10 +2,12 @@ import { createStaticNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StyleSheet } from 'react-native';
 import HomeScreen from './src/app/pages/Home';
+import LibraryScreen from './src/app/pages/Library';
 
 const RootStack = createNativeStackNavigator({
   screens: {
     Home: HomeScreen,
+    Library: LibraryScreen,
   },
 });
 

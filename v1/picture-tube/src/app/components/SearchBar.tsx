@@ -1,8 +1,8 @@
 import React from 'react';
 import { TextInput, View, StyleSheet } from 'react-native';
 import { Dropdown } from './Dropdown';
-import { LANGUAGES, YEARS } from '../data/mock';
-import { theme } from '../theme';
+import { LANGUAGES, YEARS } from '../../data/mock';
+import { theme } from '../../theme';
 
 interface Props {
   query: string;

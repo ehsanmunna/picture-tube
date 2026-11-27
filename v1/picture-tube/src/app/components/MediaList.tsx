@@ -1,8 +1,7 @@
-import React from 'react';
-import { FlatList, Pressable, Text, View, StyleSheet } from 'react-native';
-import { MediaItem, ViewMode } from '../types';
-import { theme } from '../theme';
-import { useRouter } from 'expo-router';
+// import { useRouter } from 'expo-router';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { theme } from '../../theme';
+import { MediaItem, ViewMode } from '../../types';
 
 interface Props {
   items: MediaItem[];
@@ -10,14 +9,14 @@ interface Props {
 }
 
 export function MediaList({ items, mode }: Props) {
-  const router = useRouter();
+  // const router = useRouter();
   // const onOpen = (item: MediaItem) => console.log('[Media] open', item.id, item.title);
   const onOpen = (item: MediaItem) => {
     console.log('[Media] open', item.id, item.title, item.url);
-    router.push({
-      pathname: '/player',
-      params: { title: item.title, url: item.url },
-    });
+    // router.push({
+    //   pathname: '/player',
+    //   params: { title: item.title, url: item.url },
+    // });
   };
 
   if (mode === 'table') {
