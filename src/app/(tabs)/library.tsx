@@ -1,4 +1,4 @@
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -13,15 +13,11 @@ import { MediaItem, ViewMode } from '../../types';
 import { getLibrary } from '../../api/client';
 
 export default function LibraryScreen() {
-  const router = useRouter();
-  const { link } = useLocalSearchParams<{ link: string }>();
   const [mode, setMode] = useState<ViewMode>('list');
   const [query, setQuery] = useState('');
-  const [search, setSearch] = useState('');
   const [year, setYear] = useState<string | undefined>();
   const [language, setLanguage] = useState<string | undefined>();
   const [items, setItems] = useState<MediaItem[]>([]);
-  const [loading, setLoading] = useState(false);
 
 
   // const items = useMemo(
@@ -67,7 +63,7 @@ export default function LibraryScreen() {
             title="Add Server"
             onPress={() => {
               console.log('[Library] Add Server pressed');
-              router.push('/server');
+              // router.push('/server');
             }}
           />
         </View>

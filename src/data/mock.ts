@@ -35,7 +35,7 @@ export const LANGUAGES = ['All', 'English', 'Bangla', 'Hindi'];
 const mk = (parent: string, name: string): DirNode => ({
   id: `${parent}/${name}`,
   name,
-  path: `${parent}/${name}`,
+  url: `${parent}/${name}`,
   checked: false,
   expanded: false,
 });

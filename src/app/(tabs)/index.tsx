@@ -1,6 +1,5 @@
-import { View, Text, StyleSheet, Pressable, Linking } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
-import { Link, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
+import { StyleSheet, Text, View } from 'react-native';
 import { AppButton } from '../../components/AppButton';
 import { theme } from '../../theme';
 
@@ -8,9 +7,6 @@ export default function HomeScreen() {
   const router = useRouter();
   return (
     <View style={styles.container}>
-      {/* <Text>Welcome to Picture Tube</Text>
-            <Link style={styles.buttonLink} href="/library">Library</Link>
-            <StatusBar style="auto" /> */}
       <View style={styles.logo}>
         <Text style={styles.logoText}>PT</Text>
       </View>
