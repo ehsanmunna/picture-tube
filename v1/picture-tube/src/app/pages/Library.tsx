@@ -115,6 +115,8 @@ export default function LibraryScreen() {
   };
 
   const onPressCard = (card: LibraryCard) => {
+    console.log(card);
+    
     if (card.kind === 'series') {
       navigation.navigate('Series', { title: card.title, language: card.language ?? '' });
       return;
@@ -194,7 +196,6 @@ export default function LibraryScreen() {
           )
         }
       />
-
       <AddFab onPress={() => navigation.navigate('Server')} />
     </SafeAreaView>
   );

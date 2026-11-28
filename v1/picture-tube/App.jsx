@@ -4,12 +4,14 @@ import { StyleSheet } from 'react-native';
 import HomeScreen from './src/app/pages/Home';
 import LibraryScreen from './src/app/pages/Library';
 import ServerScreen from './src/app/pages/Server';
+import PlayerScreen from './src/app/pages/Player';
 
 const RootStack = createNativeStackNavigator({
   screens: {
     Home: HomeScreen,
     Library: LibraryScreen,
     Server: ServerScreen,
+    Player: PlayerScreen,
   },
 });
 
