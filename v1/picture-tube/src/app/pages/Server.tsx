@@ -11,6 +11,7 @@ import { AppButton } from '../components/AppButton';
 import { TreeView } from '../components/TreeView';
 import { useNavigation } from '@react-navigation/native';
 import { addSelectedToLibrary, TreeNode } from '../../db/addToLibrary';
+import { browseDirectory } from '../../services/directoryService';
 
 export default function ServerScreen({ params }: any) {
   const navigation = useNavigation();
@@ -22,12 +23,10 @@ export default function ServerScreen({ params }: any) {
   const [error, setError] = useState('');
 
   const onAdd = async () => {
-    console.log('[Server] Add pressed', { name, link });
-    // TODO Phase 3: fetch the directory listing from `link`
     setLoading(true);
     setError('');
     try {
-      const server = await addServer(link); // uses the link value
+      const server = await browseDirectory(link.trim());
 
       setTree([{
         id: server.id,
@@ -65,7 +64,7 @@ export default function ServerScreen({ params }: any) {
     setTree((t) => updateNode(t, node.id, (n) => ({ ...n, loading: true })));
 
     try {
-      const listing = await addServer(node.url);
+      const listing = await browseDirectory(node.url);
 
       // Merge children and hide the spinner in the same state update,
       // so the spinner disappears exactly when the children render
@@ -87,10 +86,6 @@ export default function ServerScreen({ params }: any) {
     }
   };
 
-  const onToggleExpand = (node: DirNode) => {
-    setTree((t) => updateNode(t, node.id, (n) => ({ ...n, expanded: !n.expanded })));
-  };
-
   const gatherChecked = async (nodes: DirNode[], out: TreeNode[] = []): Promise<TreeNode[]> => {
     for (const n of nodes) {
       if (n.checked !== true) {
@@ -103,7 +98,7 @@ export default function ServerScreen({ params }: any) {
       let folders = (n.folders ?? []) as DirNode[];
 
       if (!n.loaded) {
-        const listing = await addServer(n.url);
+        const listing = await browseDirectory(n.url);
         files = listing.files ?? [];
         // children of a checked folder count as checked
         folders = (listing.folders ?? []).map((f: any) => ({ ...f, checked: true })) as DirNode[];
@@ -115,7 +110,7 @@ export default function ServerScreen({ params }: any) {
     return out;
   };
 
-  const onScan = async () => {
+  const updateLibrary = async () => {
     if (!tree.length || loading) return;
     setLoading(true);
     setError('');
@@ -133,6 +128,7 @@ export default function ServerScreen({ params }: any) {
         'Library updated',
         `${stats.added} added, ${stats.skippedNotVideo} non-video skipped, ${stats.skippedNoFiles} empty folders skipped`,
       );
+      navigation.navigate('Library')
     } catch (e: any) {
       setError(e.message);
     } finally {
@@ -141,13 +137,12 @@ export default function ServerScreen({ params }: any) {
   };
 
   const onPressFile = (file: ApiFile) => {
-    console.log('[Server] file', file.name, file.url);
-    // navigation.navigate('/Player',{ 
-    //       id: file.id,
-    //       title: file.name,
-    //       url: file.url,
-    //       ext: file.ext,
-    //     });
+    navigation.navigate('Player',{ 
+          id: file.id,
+          title: file.name,
+          url: file.url,
+          ext: file.ext,
+        });
   };
 
   return (
@@ -180,8 +175,8 @@ export default function ServerScreen({ params }: any) {
           </View>
 
           <View style={styles.footer}>
-            <TouchableOpacity style={styles.scanBtn} onPress={onScan}>
-              <Text style={styles.scanText}>Scan</Text>
+            <TouchableOpacity style={styles.scanBtn} onPress={updateLibrary}>
+              <Text style={styles.scanText}>Update Library</Text>
             </TouchableOpacity>
           </View>
         </>
