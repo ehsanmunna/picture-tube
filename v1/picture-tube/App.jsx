@@ -5,6 +5,7 @@ import HomeScreen from './src/app/pages/Home';
 import LibraryScreen from './src/app/pages/Library';
 import ServerScreen from './src/app/pages/Server';
 import PlayerScreen from './src/app/pages/Player';
+import SeriesScreen from './src/app/pages/Series';
 
 const RootStack = createNativeStackNavigator({
   screens: {
@@ -12,6 +13,7 @@ const RootStack = createNativeStackNavigator({
     Library: LibraryScreen,
     Server: ServerScreen,
     Player: PlayerScreen,
+    Series: SeriesScreen,
   },
 });
 

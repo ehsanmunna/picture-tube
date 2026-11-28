@@ -1,13 +1,22 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Pressable, SectionList, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, SectionList, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { getEpisodes } from '../db';
-import type { LibraryItem } from '../db';
-import { theme } from '../theme';
+import { getEpisodes } from '../../db';
+import type { LibraryItem } from '../../db';
+import { theme } from '../../theme';
 
-const ACCENT = '#2563eb'; // swap for your theme's primary color
+const ACCENT = theme.colors.primary;
 const pad = (n: number) => String(n).padStart(2, '0');
+const SEARCH_THRESHOLD = 20; // show the search box above this many episodes
+
+function matches(ep: LibraryItem, query: string) {
+  const q = query.trim().toLowerCase();
+  if (!q) return true;
+  if (/^\d+$/.test(q)) return ep.episode === Number(q);
+  const hay = `${ep.title} s${pad(ep.season ?? 0)}e${pad(ep.episode ?? 0)} season ${ep.season ?? ''} ep ${ep.episode ?? ''}`.toLowerCase();
+  return q.split(/\s+/).every((word) => hay.includes(word));
+}
 
 function EpisodeRow({ item, onPress }: { item: LibraryItem; onPress: () => void }) {
   const [focused, setFocused] = useState(false);
@@ -36,6 +45,7 @@ export default function SeriesScreen() {
   const [episodes, setEpisodes] = useState<LibraryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [query, setQuery] = useState('');
 
   useEffect(() => {
     let cancelled = false;
@@ -48,10 +58,13 @@ export default function SeriesScreen() {
     };
   }, [title, language]);
 
+  const showSearch = episodes.length > SEARCH_THRESHOLD;
+
   // Group by season (rows come back already sorted by season, episode)
   const sections = useMemo(() => {
     const bySeason = new Map<number, LibraryItem[]>();
     for (const ep of episodes) {
+      if (showSearch && !matches(ep, query)) continue;
       const key = ep.season ?? 0;
       bySeason.set(key, [...(bySeason.get(key) ?? []), ep]);
     }
@@ -59,7 +72,7 @@ export default function SeriesScreen() {
       title: season ? `Season ${season}` : 'Episodes',
       data,
     }));
-  }, [episodes]);
+  }, [episodes, query, showSearch]);
 
   const play = (ep: LibraryItem) => {
     const code = `${ep.season ? `S${pad(ep.season)}` : ''}${ep.episode ? `E${pad(ep.episode)}` : ''}`;
@@ -78,7 +91,22 @@ export default function SeriesScreen() {
       ) : error ? (
         <Text style={styles.error}>{error}</Text>
       ) : (
-        <SectionList
+        <>
+          {showSearch && (
+            <TextInput
+              style={styles.search}
+              placeholder={`Search ${episodes.length} episodes (e.g. 12 or s02e05)`}
+              value={query}
+              onChangeText={setQuery}
+              autoCapitalize="none"
+              autoCorrect={false}
+              returnKeyType="search"
+              clearButtonMode="while-editing"
+            />
+          )}
+          <SectionList
+          style={{ flex: 1 }}
+          keyboardShouldPersistTaps="handled"
           sections={sections}
           keyExtractor={(ep) => ep.id}
           renderSectionHeader={({ section }) => <Text style={styles.section}>{section.title}</Text>}
@@ -86,10 +114,13 @@ export default function SeriesScreen() {
           stickySectionHeadersEnabled={false}
           ListEmptyComponent={
             <View style={{ paddingTop: 48, alignItems: 'center' }}>
-              <Text style={styles.empty}>No episodes found for this series.</Text>
+              <Text style={styles.empty}>
+                {query ? 'No episodes match your search.' : 'No episodes found for this series.'}
+              </Text>
             </View>
           }
         />
+        </>
       )}
     </SafeAreaView>
   );
@@ -97,6 +128,15 @@ export default function SeriesScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: theme.spacing.md },
+  search: {
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: theme.radius.sm,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 16,
+    marginBottom: theme.spacing.sm,
+  },
   section: { fontSize: 18, fontWeight: '700', color: theme.colors.text, marginTop: theme.spacing.md, marginBottom: 6 },
   row: {
     flexDirection: 'row',
