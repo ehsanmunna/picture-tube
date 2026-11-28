@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
-import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../../theme';
+import { useNavigation } from '@react-navigation/native';
 
 interface Props {
   title: string;
@@ -12,13 +12,13 @@ interface Props {
 }
 
 export function AppHeader({ title, showBack = true, right }: Props) {
-  const router = useRouter();
+  const router = useNavigation();
   const insets = useSafeAreaInsets();
 
   const goBack = () => {
     console.log('[Header] back pressed');
-    if (router.canGoBack()) router.back();
-    else router.replace('/'); // fall back to Home
+    if (router.canGoBack()) router.goBack();
+    else router.replaceParams('/'); // fall back to Home
   };
 
   return (

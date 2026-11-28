@@ -9,6 +9,7 @@ import { MOCK_MEDIA } from '../../data/mock';
 import { theme } from '../../theme';
 import { MediaItem, ViewMode } from '../../types';
 import { getLibrary } from '../../api/client';
+import { useNavigation } from '@react-navigation/native';
 
 export default function LibraryScreen() {
   const [mode, setMode] = useState<ViewMode>('list');
@@ -16,7 +17,7 @@ export default function LibraryScreen() {
   const [year, setYear] = useState<string | undefined>();
   const [language, setLanguage] = useState<string | undefined>();
   const [items, setItems] = useState<MediaItem[]>([]);
-
+  const navigation = useNavigation();
 
   // const items = useMemo(
   //   () =>
@@ -62,6 +63,7 @@ export default function LibraryScreen() {
             onPress={() => {
               console.log('[Library] Add Server pressed');
               // router.push('/server');
+              navigation.navigate('Server');
             }}
           />
         </View>

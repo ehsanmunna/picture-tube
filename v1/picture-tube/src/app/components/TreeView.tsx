@@ -1,8 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
-import { theme } from '../theme';
-import { ApiFile, DirNode } from '../types';
-import { getCheckState } from '../utils/tree';
+import { theme } from '../../theme';
+import { ApiFile, DirNode } from '../../types';
+import { getCheckState } from '../../utils/tree';
 
 interface Props {
   nodes: DirNode[];
