@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { addServer } from '../../api/client';
-// import { addSelectedToLibrary, TreeNode } from '../../db/addToLibrary';
 import { theme } from '../../theme';
 import { ApiFile, DirNode } from '../../types';
 import { toggleChecked, updateNode } from '../../utils/tree';
@@ -168,30 +167,26 @@ export default function ServerScreen({ params }: any) {
       <AppButton title="Add Server" onPress={onAdd} />
 
       {tree.length > 0 && (
+        <>
+          <View style={{ marginTop: theme.spacing.lg, flex: 1 }}>
+            <Text style={styles.heading}>Directories</Text>
+            <ScrollView
+              nestedScrollEnabled
+              contentContainerStyle={styles.treeContent}
+              keyboardShouldPersistTaps="handled"
+            >
+              <TreeView nodes={tree} onToggleCheck={onToggleCheck} onPressFolder={onPressFolder} onPressFile={onPressFile} />
+            </ScrollView>
+          </View>
 
-        <View style={{ marginTop: theme.spacing.lg, flex: 1 }}>
-          <Text style={styles.heading}>Directories</Text>
-          <ScrollView
-            nestedScrollEnabled
-            contentContainerStyle={styles.treeContent}
-            keyboardShouldPersistTaps="handled"
-          >
-            <TreeView nodes={tree} onToggleCheck={onToggleCheck} onPressFolder={onPressFolder} onPressFile={onPressFile} />
-          </ScrollView>
-
-          {/* <View style={{ marginTop: theme.spacing.md }}>
-              <AppButton title="Scan" onPress={onScan} />
-            </View> */}
-        </View>
-
-
+          <View style={styles.footer}>
+            <TouchableOpacity style={styles.scanBtn} onPress={onScan}>
+              <Text style={styles.scanText}>Scan</Text>
+            </TouchableOpacity>
+          </View>
+        </>
       )}
-      <View style={styles.footer}>
-        {/* <AppButton title="Scan" onPress={onScan} loading={loading} disabled={loading} /> */}
-        <TouchableOpacity style={styles.scanBtn} onPress={onScan}>
-          <Text style={styles.scanText}>Scan</Text>
-        </TouchableOpacity>
-      </View>
+
       {/* </ScrollView> */}
     </SafeAreaView>
   );
